@@ -22,7 +22,6 @@ export default function Calendar() {
 
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -47,7 +46,12 @@ export default function Calendar() {
     const newSelected = new Date(year, month, dayNum);
     setSelectedDate(newSelected);
     setFocusedDay(dayNum);
-    setIsOpen(false); // Close dropdown on selection
+    setIsOpen(false);
+  };
+
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedDate(null);
   };
 
   const isSelected = (dayNum: number) => {
@@ -97,30 +101,45 @@ export default function Calendar() {
 
   return (
     <div className="relative max-w-sm mx-auto mt-10" ref={containerRef}>
-      {/* Input Trigger Button */}
       <label className="block text-sm font-medium text-gray-700 mb-1">
         Date Picker
       </label>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-2.5 bg-white border border-gray-300 rounded-xl shadow-sm text-sm text-gray-700 hover:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-        aria-expanded={isOpen}
-      >
-        <span>{formatDateString(selectedDate)}</span>
-        <svg 
-          className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
+      <div className="relative flex items-center">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full flex items-center justify-between px-4 py-2.5 bg-white border border-gray-300 rounded-xl shadow-sm text-sm text-gray-700 hover:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-left"
+          aria-expanded={isOpen}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
+          <span className={selectedDate ? "text-gray-900 font-medium" : "text-gray-400"}>
+            {formatDateString(selectedDate)}
+          </span>
+        </button>
 
-      {/* Dropdown Calendar Container */}
+        <div className="absolute right-3 flex items-center gap-2">
+          {selectedDate && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="text-xs text-gray-400 hover:text-gray-600 p-1"
+              title="Clear selection"
+            >
+              ✕
+            </button>
+          )}
+          <svg 
+            className={`w-5 h-5 text-gray-400 transition-transform pointer-events-none ${isOpen ? 'rotate-180' : ''}`}
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+
       {isOpen && (
-        <div className="absolute z-10 mt-2 w-full p-5 bg-white rounded-2xl shadow-2xl border border-gray-100 animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="absolute z-10 mt-2 w-full p-5 bg-white rounded-2xl shadow-2xl border border-gray-100">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-gray-800">
               {monthNames[month]} {year}
